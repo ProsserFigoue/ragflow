@@ -19,6 +19,7 @@ services:
     image: mysql:8.0.39
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DBNAME}
       - TZ=${TZ}
     command:
       - --max_connections=1000
