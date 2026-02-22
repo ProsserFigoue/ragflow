@@ -65,12 +65,7 @@ services:
     command:
       - --enable-adminserver
     volumes:
-      - ./ragflow-logs:/ragflow/logs
-      - ./nginx/ragflow.conf:/etc/nginx/conf.d/ragflow.conf
-      - ./nginx/proxy.conf:/etc/nginx/proxy.conf
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./service_conf.yaml.template:/ragflow/conf/service_conf.yaml.template
-      - ./entrypoint.sh:/ragflow/entrypoint.sh
+      - ragflow_logs:/ragflow/logs
     env_file: .env
     networks:
       - ragflow
@@ -83,6 +78,7 @@ volumes:
   mysql_data:
   minio_data:
   redis_data:
+  ragflow_logs:
 
 networks:
   ragflow:
