@@ -72,13 +72,14 @@ services:
     image: ${RAGFLOW_IMAGE}
     command:
       - --enable-adminserver
-    # CONFIGURATION RÉSEAU 10/10 : Pas de ports exposés sur l'hôte, routage interne pur.
+    # CONFIGURATION RÉSEAU ÉLITE : Routage interne forcé sur le port 80 (Frontend)
     labels:
       - "coolify.proxy.port=80"
       - "traefik.enable=true"
-      - "traefik.http.routers.${COOLIFY_CONTAINER_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.${COOLIFY_CONTAINER_NAME}.tls=true"
-      - "traefik.http.services.${COOLIFY_CONTAINER_NAME}.loadbalancer.server.port=80"
+      - "traefik.http.routers.ragflow-router.rule=Host(`${SERVICE_FQDN_RAGFLOW_CPU}`)"
+      - "traefik.http.routers.ragflow-router.entrypoints=websecure"
+      - "traefik.http.routers.ragflow-router.tls=true"
+      - "traefik.http.services.ragflow-service.loadbalancer.server.port=80"
     volumes:
       - ragflow_logs:/ragflow/logs
     env_file: .env
