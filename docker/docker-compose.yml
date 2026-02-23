@@ -65,9 +65,10 @@ services:
     image: ${RAGFLOW_IMAGE}
     command:
       - --enable-adminserver
-    # Instructions prioritaires pour le proxy Coolify
+    # FORÇAGE DU PORT VIA LABELS POUR COOLIFY
     labels:
       - "coolify.proxy.port=9380"
+      - "traefik.http.services.${COOLIFY_CONTAINER_NAME}.loadbalancer.server.port=9380"
     ports:
       - "9380:9380"
       - "9381:9381"
@@ -79,11 +80,6 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9380/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
 volumes:
   esdata01:
