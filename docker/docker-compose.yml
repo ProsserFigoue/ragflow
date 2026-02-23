@@ -65,13 +65,15 @@ services:
     image: ${RAGFLOW_IMAGE}
     command:
       - --enable-adminserver
-    # FORÇAGE DU PORT VIA LABELS POUR COOLIFY
+    # LABELS DE FORÇAGE POUR LE PROXY COOLIFY
     labels:
       - "coolify.proxy.port=9380"
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COOLIFY_CONTAINER_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COOLIFY_CONTAINER_NAME}.tls=true"
       - "traefik.http.services.${COOLIFY_CONTAINER_NAME}.loadbalancer.server.port=9380"
     ports:
       - "9380:9380"
-      - "9381:9381"
     volumes:
       - ragflow_logs:/ragflow/logs
     env_file: .env
