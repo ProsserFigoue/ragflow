@@ -70,16 +70,13 @@ services:
       es01:
         condition: service_healthy
     image: ${RAGFLOW_IMAGE}
-    command:
-      - --enable-adminserver
-    # CONFIGURATION RÉSEAU ÉLITE : Routage interne forcé sur le port 80 (Frontend)
+    # On ajoute explicitement les drapeaux de démarrage pour l'admin et l'API
+    command: ["/bin/bash", "-c", "python3 rag/svr/ragflow_server.py & python3 admin/server/admin_server.py"]
     labels:
-      - "coolify.proxy.port=80"
+      - "coolify.proxy.port=9380"
       - "traefik.enable=true"
-      - "traefik.http.routers.ragflow-router.rule=Host(`${SERVICE_FQDN_RAGFLOW_CPU}`)"
-      - "traefik.http.routers.ragflow-router.entrypoints=websecure"
-      - "traefik.http.routers.ragflow-router.tls=true"
-      - "traefik.http.services.ragflow-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.ragflow.rule=Host(`${SERVICE_FQDN_RAGFLOW_CPU}`)"
+      - "traefik.http.services.ragflow.loadbalancer.server.port=9380"
     volumes:
       - ragflow_logs:/ragflow/logs
     env_file: .env
@@ -89,7 +86,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "timeout 1s bash -c ': </dev/tcp/127.0.0.1/80' || exit 1"]
+      test: ["CMD-SHELL", "timeout 1s bash -c ': </dev/tcp/127.0.0.1/9380' || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
