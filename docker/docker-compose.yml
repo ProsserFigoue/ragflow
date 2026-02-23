@@ -65,6 +65,9 @@ services:
     image: ${RAGFLOW_IMAGE}
     command:
       - --enable-adminserver
+    # Exposition des ports pour Coolify
+    labels:
+      - "coolify.proxy.port=9380"
     ports:
       - "9380:9380"
       - "9381:9381"
