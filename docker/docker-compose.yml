@@ -65,13 +65,12 @@ services:
     image: ${RAGFLOW_IMAGE}
     command:
       - --enable-adminserver
-    # Exposition des ports pour Coolify
+    # Instructions prioritaires pour le proxy Coolify
     labels:
       - "coolify.proxy.port=9380"
     ports:
       - "9380:9380"
       - "9381:9381"
-      - "9382:9382"
     volumes:
       - ragflow_logs:/ragflow/logs
     env_file: .env
@@ -80,6 +79,11 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9380/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   esdata01:
