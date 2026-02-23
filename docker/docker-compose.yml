@@ -14,11 +14,6 @@ services:
     networks:
       - ragflow
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   mysql:
     image: mysql:8.0.39
@@ -56,7 +51,7 @@ services:
 
   redis:
     image: redis:7.2.4
-    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 128mb --maxmemory-policy allkeys-lru
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 130mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     networks:
@@ -67,16 +62,13 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      es01:
-        condition: service_healthy
     image: ${RAGFLOW_IMAGE}
-    # On ajoute explicitement les drapeaux de démarrage pour l'admin et l'API
-    command: ["/bin/bash", "-c", "python3 rag/svr/ragflow_server.py & python3 admin/server/admin_server.py"]
-    labels:
-      - "coolify.proxy.port=9380"
-      - "traefik.enable=true"
-      - "traefik.http.routers.ragflow.rule=Host(`${SERVICE_FQDN_RAGFLOW_CPU}`)"
-      - "traefik.http.services.ragflow.loadbalancer.server.port=9380"
+    command:
+      - --enable-adminserver
+    ports:
+      - "9380:9380"
+      - "9381:9381"
+      - "9382:9382"
     volumes:
       - ragflow_logs:/ragflow/logs
     env_file: .env
@@ -85,11 +77,6 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: ["CMD-SHELL", "timeout 1s bash -c ': </dev/tcp/127.0.0.1/9380' || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
 
 volumes:
   esdata01:
